@@ -65,7 +65,7 @@ function findValidEmojiComboController(req, res) {
     const gStaticUrl = combination.gStaticUrl;
     res.json({ gStaticUrl });
   } catch (error) {
-    res.status(500).json({ error: "Valid emoji combination not found" });
+    res.status(404).json({ error: "Valid emoji combination not found" });
   }
 }
 
