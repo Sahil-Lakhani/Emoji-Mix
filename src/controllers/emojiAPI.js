@@ -34,27 +34,21 @@ function findValidEmojiCombo(leftEmoji, rightEmoji) {
     : emojiToCodepoint(rightEmoji);
 
   // Find the valid emoji combination
-  for (const code in metadata.data) {
-    const combinations = metadata.data[code].combinations;
+  const validCombination = Object.values(metadata.data)
+    .flatMap((entry) => entry.combinations)
+    .find(
+      ({ leftEmojiCodepoint, rightEmojiCodepoint }) =>
+        leftEmojiCodepoint === leftEmojiCodepoint &&
+        rightEmojiCodepoint === rightEmojiCodepoint
+    );
 
-    for (const combination of combinations) {
-      const {
-        leftEmojiCodepoint: combinationLeftCodepoint,
-        rightEmojiCodepoint: combinationRightCodepoint,
-      } = combination;
-
-      // console.log(combinationLeftCodepoint, "in for loop");
-
-      if (
-        combinationLeftCodepoint === leftEmojiCodepoint &&
-        combinationRightCodepoint === rightEmojiCodepoint
-      ) {
-        return combination;
-      }
-    }
+  if (validCombination) {
+    return validCombination;
   }
+
   throw new Error("Valid emoji combination not found");
 }
+
 
 
 function findValidEmojiComboController(req, res) {
@@ -70,24 +64,15 @@ function findValidEmojiComboController(req, res) {
 }
 
 function getAllPossibleEmojisForCombination(emoji) {
-  const possibleEmojis = [];
+  const possibleEmojis = Object.values(metadata.data).flatMap((entry) =>
+    entry.combinations
+      .filter((combination) => combination.rightEmoji === emoji)
+      .map((combination) => combination.leftEmoji)
+  );
 
-  for (const code in metadata.data) {
-    const combinations = metadata.data[code].combinations;
-
-    for (const combination of combinations) {
-      if (combination.rightEmoji === emoji) {
-        possibleEmojis.push(combination.leftEmoji);
-      }
-      // console.log(combinations);
-    }
-  }
-
-  // Remove duplicates from possibleEmojis array
-  const uniquePossibleEmojis = [...new Set(possibleEmojis)];
-
-  return uniquePossibleEmojis;
+  return [...new Set(possibleEmojis)];
 }
+
 
 module.exports = {
   findValidEmojiComboController,

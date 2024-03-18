@@ -17,7 +17,7 @@ app.post("/api/getPossibleEmojisForCombination", (req, res) => {
     const possibleEmojis = emojiAPI.getAllPossibleEmojisForCombination(emoji);
     res.json({ possibleEmojis });
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(400).json({ error: "Internal server error" });
   }
 });
 
