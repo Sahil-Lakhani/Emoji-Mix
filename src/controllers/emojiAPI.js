@@ -1,5 +1,6 @@
 const metadata = require("../../data/metadata.json");
 
+// Find the codepoint of the given emoji
 function findEmojiCodepoint(emoji) {
   for (const code in metadata.data) {
     const emojiData = metadata.data[code];
@@ -8,33 +9,28 @@ function findEmojiCodepoint(emoji) {
       return emojiData.emojiCodepoint;
     }
   }
-
-  // If the emoji is not found, return null or throw an error
   return null;
 }
 
+// Find a valid emoji combination for the given emojis
 function findValidEmojiCombo(leftEmoji, rightEmoji) {
   const leftEmojiCodepoint = findEmojiCodepoint(leftEmoji);
-  // console.log(leftEmojiCodepoint);
-
   const rightEmojiCodepoint = findEmojiCodepoint(rightEmoji);
-  // console.log(rightEmojiCodepoint);
 
   // Find the valid emoji combination
   for (const code in metadata.data) {
     const combinations = metadata.data[code].combinations;
-
     for (const combination of combinations) {
       const {
         leftEmojiCodepoint: combinationLeftCodepoint,
         rightEmojiCodepoint: combinationRightCodepoint,
       } = combination;
-
+      // Check if the combination matches the input emojis
       if (
         combinationLeftCodepoint === leftEmojiCodepoint &&
         combinationRightCodepoint === rightEmojiCodepoint
       ) {
-        console.log(combination);
+        // Return the valid emoji combination if found
         return combination;
       }
     }
@@ -42,9 +38,12 @@ function findValidEmojiCombo(leftEmoji, rightEmoji) {
   throw new Error("Valid emoji combination not found");
 }
 
+// Find a valid emoji combination and return the GStatic URL
 function findValidEmojiComboController(req, res) {
   const { leftEmoji, rightEmoji } = req.body;
-
+  if (!leftEmoji || !rightEmoji) {
+    return res.status(400).json({ error: "Missing required parameters" });
+  }
   try {
     const combination = findValidEmojiCombo(leftEmoji, rightEmoji);
     const gStaticUrl = combination.gStaticUrl;
@@ -54,6 +53,7 @@ function findValidEmojiComboController(req, res) {
   }
 }
 
+// Get all possible emojis for a given emoji combination
 function getAllPossibleEmojisForCombination(emoji) {
   const possibleEmojis = Object.values(metadata.data).flatMap((entry) =>
     entry.combinations

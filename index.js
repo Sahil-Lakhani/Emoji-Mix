@@ -12,7 +12,9 @@ app.post("/api/findValidEmojiCombo", emojiAPI.findValidEmojiComboController);
 // Define API endpoint to get all possible emojis for combination
 app.post("/api/getPossibleEmojisForCombination", (req, res) => {
   const { emoji } = req.body;
-
+  if (!emoji) {
+    return res.status(400).json({ error: "Missing emoji parameter" });
+  }
   try {
     const possibleEmojis = emojiAPI.getAllPossibleEmojisForCombination(emoji);
     res.json({ possibleEmojis });
