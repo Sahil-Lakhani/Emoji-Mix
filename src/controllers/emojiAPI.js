@@ -10,46 +10,50 @@ function getSupportedEmoji() {
   return metadata.knownSupportedEmoji;
 }
 
-function isCodepoint(input) {
-  return input.includes("-");
-}
-
-function emojiToCodepoint(emoji) {
-  return emoji.codePointAt(0).toString(16);
-}
-
-function toPrintableEmoji(emojiCodepoint) {
-  return String.fromCodePoint(
-    ...emojiCodepoint.split("-").map((p) => parseInt(`0x${p}`))
-  );
-}
-
-function findValidEmojiCombo(leftEmoji, rightEmoji) {
-  // Convert emojis to codepoints if necessary
-  const leftEmojiCodepoint = isCodepoint(leftEmoji)
-    ? leftEmoji
-    : emojiToCodepoint(leftEmoji);
-  const rightEmojiCodepoint = isCodepoint(rightEmoji)
-    ? rightEmoji
-    : emojiToCodepoint(rightEmoji);
-
-  // Find the valid emoji combination
-  const validCombination = Object.values(metadata.data)
-    .flatMap((entry) => entry.combinations)
-    .find(
-      ({ leftEmojiCodepoint, rightEmojiCodepoint }) =>
-        leftEmojiCodepoint === leftEmojiCodepoint &&
-        rightEmojiCodepoint === rightEmojiCodepoint
-    );
-
-  if (validCombination) {
-    return validCombination;
+function findEmojiCodepoint(emoji) {
+  // Iterate through the metadata to find the emoji
+  for (const code in metadata.data) {
+    const emojiData = metadata.data[code];
+    // Check if the emoji matches the input emoji
+    if (emojiData.emoji === emoji) {
+      return emojiData.emojiCodepoint;
+    }
   }
 
-  throw new Error("Valid emoji combination not found");
+  // If the emoji is not found, return null or throw an error
+  return null;
 }
 
 
+function findValidEmojiCombo(leftEmoji, rightEmoji) {
+
+  const leftEmojiCodepoint = findEmojiCodepoint(leftEmoji);
+  // console.log(leftEmojiCodepoint);
+
+  const rightEmojiCodepoint = findEmojiCodepoint(rightEmoji);
+  // console.log(rightEmojiCodepoint);
+
+  // Find the valid emoji combination
+  for (const code in metadata.data) {
+    const combinations = metadata.data[code].combinations;
+
+    for (const combination of combinations) {
+      const {
+        leftEmojiCodepoint: combinationLeftCodepoint,
+        rightEmojiCodepoint: combinationRightCodepoint,
+      } = combination;
+
+      if (
+        combinationLeftCodepoint === leftEmojiCodepoint &&
+        combinationRightCodepoint === rightEmojiCodepoint
+      ) {
+        console.log(combination);
+        return combination;
+      }
+    }
+  }
+  throw new Error("Valid emoji combination not found");
+}
 
 function findValidEmojiComboController(req, res) {
   const { leftEmoji, rightEmoji } = req.body;
@@ -57,7 +61,7 @@ function findValidEmojiComboController(req, res) {
   try {
     const combination = findValidEmojiCombo(leftEmoji, rightEmoji);
     const gStaticUrl = combination.gStaticUrl;
-    res.json({ gStaticUrl });
+    res.json(combination);
   } catch (error) {
     res.status(404).json({ error: "Valid emoji combination not found" });
   }
@@ -66,19 +70,15 @@ function findValidEmojiComboController(req, res) {
 function getAllPossibleEmojisForCombination(emoji) {
   const possibleEmojis = Object.values(metadata.data).flatMap((entry) =>
     entry.combinations
-      .filter((combination) => combination.rightEmoji === emoji)
-      .map((combination) => combination.leftEmoji)
+      .filter((combination) => combination.leftEmoji === emoji)
+      .map((combination) => combination.rightEmoji)
   );
 
   return [...new Set(possibleEmojis)];
 }
 
-
 module.exports = {
   findValidEmojiComboController,
   findValidEmojiCombo,
-  toPrintableEmoji,
-  isCodepoint,
-  emojiToCodepoint,
   getAllPossibleEmojisForCombination,
 };
