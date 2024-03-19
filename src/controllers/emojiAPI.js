@@ -2,6 +2,8 @@
 
 const metadata = require("../../data/metadata.json");
 
+const fs = require("fs");
+
 function getEmojiData(emojiCodepoint) {
   return metadata.data[emojiCodepoint];
 }
@@ -61,7 +63,7 @@ function findValidEmojiComboController(req, res) {
   try {
     const combination = findValidEmojiCombo(leftEmoji, rightEmoji);
     const gStaticUrl = combination.gStaticUrl;
-    res.json(combination);
+    res.json(gStaticUrl);
   } catch (error) {
     res.status(404).json({ error: "Valid emoji combination not found" });
   }
@@ -76,6 +78,14 @@ function getAllPossibleEmojisForCombination(emoji) {
 
   return [...new Set(possibleEmojis)];
 }
+
+
+
+
+
+
+
+
 
 module.exports = {
   findValidEmojiComboController,
