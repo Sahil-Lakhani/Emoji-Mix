@@ -1,19 +1,6 @@
-// Combined file: emojiAPI.js
-
 const metadata = require("../../data/metadata.json");
 
-const fs = require("fs");
-
-function getEmojiData(emojiCodepoint) {
-  return metadata.data[emojiCodepoint];
-}
-
-function getSupportedEmoji() {
-  return metadata.knownSupportedEmoji;
-}
-
 function findEmojiCodepoint(emoji) {
-  // Iterate through the metadata to find the emoji
   for (const code in metadata.data) {
     const emojiData = metadata.data[code];
     // Check if the emoji matches the input emoji
@@ -26,9 +13,7 @@ function findEmojiCodepoint(emoji) {
   return null;
 }
 
-
 function findValidEmojiCombo(leftEmoji, rightEmoji) {
-
   const leftEmojiCodepoint = findEmojiCodepoint(leftEmoji);
   // console.log(leftEmojiCodepoint);
 
@@ -78,14 +63,6 @@ function getAllPossibleEmojisForCombination(emoji) {
 
   return [...new Set(possibleEmojis)];
 }
-
-
-
-
-
-
-
-
 
 module.exports = {
   findValidEmojiComboController,
