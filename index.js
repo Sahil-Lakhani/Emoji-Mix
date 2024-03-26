@@ -2,9 +2,14 @@ const express = require("express");
 const emojiAPI = require("./src/controllers/emojiAPI");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 app.use(express.json());
+
+// default Route
+app.get("/", (req, res) => {
+  res.send("System is operational");
+});
 
 // Define API endpoint to find a valid emoji combination
 app.post("/api/findValidEmojiCombo", emojiAPI.findValidEmojiComboController);
