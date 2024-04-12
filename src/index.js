@@ -1,5 +1,5 @@
 const express = require("express");
-const emojiAPI = require("./src/controllers/emojiAPI");
+const emojiAPI = require("./controllers/emojiAPI");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -31,3 +31,5 @@ app.post("/api/getPossibleEmojisForCombination", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = app
