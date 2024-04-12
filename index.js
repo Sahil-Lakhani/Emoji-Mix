@@ -6,6 +6,10 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.status(200).json({"status" : "okay"});
+});
+
 // Define API endpoint to find a valid emoji combination
 app.post("/api/findValidEmojiCombo", emojiAPI.findValidEmojiComboController);
 
